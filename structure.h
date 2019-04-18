@@ -10,7 +10,7 @@
 #define NB_ATOM_NAMES 119
 #define AUCUNE_LIAISON (-1024)
 #define NB_MOLECULES 90130
-#define total_molecules 10000 // dont on cacluler similarite graphe de cycles 
+#define total_molecules 300 // dont on cacluler similarite graphe de cycles 
 #define date 50
 
 char *atom_name[NB_ATOM_NAMES];

@@ -30,10 +30,15 @@ int main(int argc, char *argv[])
 	}
 
 	if( C == NULL)
+	{
+		fclose(G);
 		C = lecture_fichier_graphes_cycles();
+	}
+		
 	
 	int i,j;
 	
+	printf("\n Debut du calcul de la similarite  : %.3lf s\n",chrono());
 	for ( i = numero ; i < total_molecules; i++)
 	{
 		
@@ -47,7 +52,7 @@ int main(int argc, char *argv[])
 		indice = 0;
 		
 	} 
-
+	printf("\n Fin du calcul de la similarite  : %.3lf s\n",chrono());
 	int nb_mol;
 	printf("3. Libération de la mémoire : %.3lf s\n",chrono());
 

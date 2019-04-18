@@ -2071,7 +2071,7 @@ GRAPHE_CYCLE * calcul_graphe_cycles_all(int *liste, struct molecule *M)
 	}
 	fclose(G);
 	printf("\n Fin du Calcul du graphe des cycles des %d molecules: %.3lf s\n",total_molecules,chrono());
-	
+
 	stocker_graphes_cycles(C);
 	
 	return C;
@@ -2103,10 +2103,10 @@ GRAPHE_CYCLE * lecture_fichier_graphes_cycles()
 			fprintf(stdout,"\r%5d / %d",i,total_molecules);
 			fflush(stdout); 
 		}
-
+		fscanf(G,"%d",&id);
 		fscanf(G,"%d",&C[i].nb_sommets);
 		fscanf(G,"%d",&C[i].nb_aretes);
-
+		printf("%d %d \n", C[i].nb_sommets,C[i].nb_aretes);
 		C[i].liste_sommets = malloc(C[i].nb_sommets * sizeof (SOMMET));
 		C[i].liste_aretes = malloc(C[i].nb_aretes * sizeof (ARETE));
 
@@ -2114,6 +2114,7 @@ GRAPHE_CYCLE * lecture_fichier_graphes_cycles()
 		{
 			fscanf(G,"%d",&C[i].liste_sommets[j].id);
 			fscanf(G,"%d",&C[i].liste_sommets[j].poids);
+			printf("%d %d \n", C[i].liste_sommets[j].id,C[i].liste_sommets[j].poids);
 		}
 
 		for( j = 0; j < C[i].nb_aretes;j++)
@@ -2122,12 +2123,13 @@ GRAPHE_CYCLE * lecture_fichier_graphes_cycles()
 			fscanf(G,"%d",&C[i].liste_aretes[j].id2);
 			fscanf(G,"%d",&C[i].liste_aretes[j].type);
 			fscanf(G,"%d",&C[i].liste_aretes[j].poids);
+			printf("%d %d %d %d\n", C[i].liste_aretes[j].id1,C[i].liste_aretes[j].id2,C[i].liste_aretes[j].type,C[i].liste_aretes[j].poids);
 		}
 
 	}
 
 	fclose(G);
-	printf("Fin de la Lecture du fichier des graphes de cycles: %.3lf s\n",chrono());
+	printf("\n Fin de la Lecture du fichier des graphes de cycles: %.3lf s\n",chrono());
 
 	return C;
 }
