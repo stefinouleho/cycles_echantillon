@@ -617,3 +617,97 @@ float similarite(GRAPHE_CYCLE a,GRAPHE_CYCLE b)
 	}	
 	return sim;
 }
+
+void calcul_similarite_cycle( int i ,int j, struct molecule *M, int *liste_molecules)
+{
+	int pos1,pos2;
+
+	float r;
+	float start,stop;
+	pos1 = position_M(liste_molecules[i],M);
+	pos2 = position_M(liste_molecules[j],M);
+	start = chrono();
+	GRAPHE_CYCLE c = construction_graphe_cycles(M[pos1]);
+	GRAPHE_CYCLE d = construction_graphe_cycles(M[pos2]);
+	r = similarite(c,d);
+	stop = chrono();
+	char fichier[256];
+	//sprintf(fichier,"Dossier/%d_%d.result",i,j);
+	sprintf(fichier,"Dossier/similarite.result");
+	
+	FILE *F = fopen(fichier,"a");
+	if( F == NULL)
+	{
+		fprintf(stdout, "Cannot open the file %s\n",fichier);
+		exit(19);
+	}
+	
+	sprintf(fichier,"Dossier/temps.result");
+	FILE *G = fopen(fichier,"a");
+	if( G == NULL)
+	{
+		fprintf(stdout, " Cannot open the file %s\n",fichier);
+		exit(19);
+	}
+	fprintf(F,"%.2f	",r);
+	fprintf(G,"%.2f	",stop - start);
+	
+	if( j == i - 1)
+	{
+		fprintf(F,"\n");
+		fprintf(G,"\n");
+	}
+		
+	fclose(F);
+	fclose(G);
+	
+	sauvegarde_compteur(i,j);
+	liberer_graphe_cycles(c);
+	liberer_graphe_cycles(d);
+	//printf(" %d %d %f\n",pos1, pos2 ,r);
+}
+
+void calcul_similarite_cycle_optimisation( int i ,int j, GRAPHE_CYCLE *C)
+{
+
+	float r;
+	float start,stop;
+
+	start = chrono();
+	r = similarite(C[i],C[j]);
+	stop = chrono();
+
+	char fichier[256];
+	//sprintf(fichier,"Dossier/%d_%d.result",i,j);
+	sprintf(fichier,"Dossier/similarite.result");
+	
+	FILE *F = fopen(fichier,"a");
+	if( F == NULL)
+	{
+		fprintf(stdout, "Cannot open the file %s\n",fichier);
+		exit(19);
+	}
+	
+	sprintf(fichier,"Dossier/temps.result");
+	FILE *G = fopen(fichier,"a");
+	if( G == NULL)
+	{
+		fprintf(stdout, " Cannot open the file %s\n",fichier);
+		exit(19);
+	}
+	fprintf(F,"%.2f	",r);
+	fprintf(G,"%.2f	",stop - start);
+	
+	if( j == i - 1)
+	{
+		fprintf(F,"\n");
+		fprintf(G,"\n");
+	}
+		
+	fclose(F);
+	fclose(G);
+	
+	sauvegarde_compteur(i,j);
+	//printf(" %d %d %f\n",pos1, pos2 ,r);
+}
+

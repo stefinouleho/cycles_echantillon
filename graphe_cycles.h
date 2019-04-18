@@ -1,6 +1,7 @@
 #ifndef NOM_D1
 #define NOM_D1
 #include "structure.h"
+#include "lecture_molecule_sdf.h"
 
 GRAPHE_CYCLE construction_graphe_cycles(struct molecule m);
 void elimination_feuilles(struct molecule m);
@@ -51,7 +52,9 @@ int nombre_de_cycles(int sommet1,int *chemin,int sommet2,graphemol g);
 ARETE copier_arete(ARETE a , ARETE b);
 void liberer_graphe_cycles( GRAPHE_CYCLE c);
 int min( int a , int b);
-
+GRAPHE_CYCLE * calcul_graphe_cycles_all(int *liste, struct molecule *M);
+GRAPHE_CYCLE * lecture_fichier_graphes_cycles();
+void stocker_graphes_cycles(GRAPHE_CYCLE * C);
 #endif
 
 

@@ -24,5 +24,5 @@ struct couple *construction_couples_cycles(GRAPHE_CYCLE a,GRAPHE_CYCLE b,int tai
 struct type_arete ** construction_matrice_graphe_cycles(GRAPHE_CYCLE a);
 void liberer_type_arete( struct type_arete **m, GRAPHE_CYCLE a);
 int*  graphe_g12_cycles(graph g12, int* clique_max,GRAPHE_CYCLE a,GRAPHE_CYCLE b);
-
+void calcul_similarite_cycle_optimisation( int i ,int j, GRAPHE_CYCLE *C);
 #endif

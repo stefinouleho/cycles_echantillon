@@ -1,55 +1,6 @@
 #include "similarite_cycles.h"
 
 
-void calcul_similarite_cycle( int i ,int j, struct molecule *M, int *liste_molecules)
-{
-	int pos1,pos2;
-
-	float r;
-	float start,stop;
-	pos1 = position_M(liste_molecules[i],M);
-	pos2 = position_M(liste_molecules[j],M);
-	start = chrono();
-	GRAPHE_CYCLE c = construction_graphe_cycles(M[pos1]);
-	GRAPHE_CYCLE d = construction_graphe_cycles(M[pos2]);
-	r = similarite(c,d);
-	stop = chrono();
-	char fichier[256];
-	//sprintf(fichier,"Dossier/%d_%d.result",i,j);
-	sprintf(fichier,"Dossier/similarite.result");
-	
-	FILE *F = fopen(fichier,"a");
-	if( F == NULL)
-	{
-		fprintf(stdout, "Cannot open the file %s\n",fichier);
-		exit(19);
-	}
-	
-	sprintf(fichier,"Dossier/temps.result");
-	FILE *G = fopen(fichier,"a");
-	if( G == NULL)
-	{
-		fprintf(stdout, " Cannot open the file %s\n",fichier);
-		exit(19);
-	}
-	fprintf(F,"%.2f	",r);
-	fprintf(G,"%.2f	",stop - start);
-	
-	if( j == i - 1)
-	{
-		fprintf(F,"\n");
-		fprintf(G,"\n");
-	}
-		
-	fclose(F);
-	fclose(G);
-	
-	sauvegarde_compteur(i,j);
-	liberer_graphe_cycles(c);
-	liberer_graphe_cycles(d);
-	//printf(" %d %d %f\n",pos1, pos2 ,r);
-}
-
 int main(int argc, char *argv[])
 {
 
@@ -68,11 +19,20 @@ int main(int argc, char *argv[])
 
 	int *liste_molecules = lecture_liste_molecules();
 
+	// on verifie si le fichier GrapheCyclesPrecalcules.cycles existe 
 
+	FILE *G = fopen("fichiers/GrapheCyclesPrecalcules.cycles","r");
+	GRAPHE_CYCLE *C = NULL;
+	if( G == NULL)
+	{// si le fichier n'xiste pas on calcule le graphe de cycles de toutes les molecules de liste_molecules
+		fclose(G);
+		C = calcul_graphe_cycles_all(liste_molecules, M);
+	}
+
+	if( C == NULL)
+		C = lecture_fichier_graphes_cycles();
+	
 	int i,j;
-	
-	
-	
 	
 	for ( i = numero ; i < total_molecules; i++)
 	{
@@ -82,10 +42,7 @@ int main(int argc, char *argv[])
 
 		for ( j = indice ; j < i ; j++)
 		{
-			//printf(" %d %d\n",i,j );
-			calcul_similarite_cycle(i,j, M,liste_molecules);
-			
-			
+			calcul_similarite_cycle_optimisation(i,j,C);
 		}
 		indice = 0;
 		
@@ -97,6 +54,8 @@ int main(int argc, char *argv[])
 	
 
 	free(liste_molecules);
+	for(nb_mol= 0 ; nb_mol < total_molecules ; nb_mol++) 
+		liberer_graphe_cycles(C[nb_mol]);
 	for(nb_mol= 0 ; nb_mol < NB_MOLECULES ; nb_mol++) 
 		liberer_molecule(M[nb_mol]);
 	free(M);
