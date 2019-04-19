@@ -52,9 +52,13 @@ int nombre_de_cycles(int sommet1,int *chemin,int sommet2,graphemol g);
 ARETE copier_arete(ARETE a , ARETE b);
 void liberer_graphe_cycles( GRAPHE_CYCLE c);
 int min( int a , int b);
-GRAPHE_CYCLE * calcul_graphe_cycles_all(int *liste, struct molecule *M);
+void calcul_graphe_cycles_all(int *liste, struct molecule *M, int position);
 GRAPHE_CYCLE * lecture_fichier_graphes_cycles();
 void stocker_graphes_cycles(GRAPHE_CYCLE * C);
+void initialisation_fichier();
+void ecrire_cycle_fichier(int i, GRAPHE_CYCLE c);
+GRAPHE_CYCLE * lecture_graphes_cycles_precedent(GRAPHE_CYCLE * C, int position);
+void ecrire_temps_calcul(int position, float start, float stop);
 #endif
 
 

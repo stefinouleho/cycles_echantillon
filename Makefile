@@ -12,7 +12,10 @@ init:
 	rm -f tmp
 	rm -f fichiers/liste_molecules_mces
 	rm -f fichiers/liste_molecules_mces.save
+	rm -f fichiers/GrapheCyclesPrecalcules.temps
+	rm -f fichiers/GrapheCyclesPrecalcules.cycles
 	echo "0 0" > prochain
+	echo "0" > graphe_cycle
 	cp fichiers/molecules.data fichiers/molecules.data.save
 	mkdir Dossier
 	touch Dossier/similarite.result

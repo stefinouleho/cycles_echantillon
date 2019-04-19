@@ -2040,9 +2040,95 @@ void stocker_graphes_cycles(GRAPHE_CYCLE * C)
 
 }
 
-GRAPHE_CYCLE * calcul_graphe_cycles_all(int *liste, struct molecule *M)
+void ecrire_cycle_fichier(int i, GRAPHE_CYCLE C)
 {
-	FILE *G = fopen("fichiers/GrapheCyclesPrecalcules.temps","w");
+	int j;
+
+	FILE *G = fopen("fichiers/GrapheCyclesPrecalcules.cycles","a");
+
+	if ( G == NULL)
+	{
+		fprintf(stdout,"cannot write in the file fichiers/GrapheCyclesPrecalcules.cycles\n");
+		exit(121);
+	}
+	fprintf(G, "%d\n%d %d \n", i, C.nb_sommets,C.nb_aretes); // numero, nombre de sommets et nombre d'aretes
+	
+	for( j = 0; j < C.nb_sommets;j++) //copier les sommets 
+	{
+		fprintf(G, "%d %d \n",C.liste_sommets[j].id,C.liste_sommets[j].poids);
+	}
+	for( j = 0; j < C.nb_aretes;j++) //copier les sommets 
+	{
+		fprintf(G, "%d %d %d %d\n",C.liste_aretes[j].id1, C.liste_aretes[j].id2, C.liste_aretes[j].type, C.liste_aretes[j].poids);
+	}
+
+	fclose(G);
+
+}
+
+void initialisation_fichier()
+{
+
+	FILE *G = fopen("fichiers/GrapheCyclesPrecalcules.cycles","w");
+
+	if ( G == NULL)
+	{
+		fprintf(stdout,"cannot write in the file fichiers/GrapheCyclesPrecalcules.cycles\n");
+		exit(121);
+	}
+	fprintf(G, "%d\n", total_molecules);
+	fclose(G);
+}
+
+GRAPHE_CYCLE * lecture_graphes_cycles_precedent(GRAPHE_CYCLE * C, int position)
+{
+	printf("\n Lecture des graphes de cycles %d molecules deja calculés %.3lf s\n",position ,chrono());
+	
+	 FILE *G= fopen("fichiers/GrapheCyclesPrecalcules.cycles","r");
+
+	if ( G == NULL)
+	{
+		fprintf(stdout,"cannot open in the file fichiers/GrapheCyclesPrecalcules.cycles\n");
+		exit(124);
+	}
+	int i,j,k;
+	fscanf(G,"%d",&k);
+	for( i = 0; i < position; i++)
+	{
+		if (i % 1 == 0) 
+		{ 
+			fprintf(stdout,"\r%5d / %d",i,position);
+			fflush(stdout); 
+		}
+		fscanf(G,"%d",&k);
+		fscanf(G,"%d",&C[i].nb_sommets);
+		fscanf(G,"%d",&C[i].nb_aretes);
+		C[i].liste_sommets = malloc(C[i].nb_sommets * sizeof (SOMMET));
+		C[i].liste_aretes = malloc(C[i].nb_aretes * sizeof (ARETE));
+
+		for( j = 0; j < C[i].nb_sommets;j++)
+		{
+			fscanf(G,"%d",&C[i].liste_sommets[j].id);
+			fscanf(G,"%d",&C[i].liste_sommets[j].poids);
+		}
+
+		for( j = 0; j < C[i].nb_aretes;j++)
+		{
+			fscanf(G,"%d",&C[i].liste_aretes[j].id1);
+			fscanf(G,"%d",&C[i].liste_aretes[j].id2);
+			fscanf(G,"%d",&C[i].liste_aretes[j].type);
+			fscanf(G,"%d",&C[i].liste_aretes[j].poids);
+		}
+
+	}
+	printf("\n Fin de Lecture des graphes de cycles %d molecules deja calculés %.3lf s\n",position ,chrono());
+	return C;
+}
+
+void ecrire_temps_calcul(int position, float start, float stop)
+{
+
+	FILE *G = fopen("fichiers/GrapheCyclesPrecalcules.temps","a");
 
 	if ( G == NULL)
 	{
@@ -2050,14 +2136,30 @@ GRAPHE_CYCLE * calcul_graphe_cycles_all(int *liste, struct molecule *M)
 		exit(123);
 	}
 
-	printf("\n Calcul du graphe des cycles des %d molecules : %.3lf s\n",total_molecules,chrono());
-	GRAPHE_CYCLE *C;
+	fprintf(G, "%d %.4f\n", position, stop - start);
+	fflush(G);
+	fclose(G);
 
-	C = malloc( total_molecules *sizeof( GRAPHE_CYCLE));
+}
+void calcul_graphe_cycles_all(int *liste, struct molecule *M, int position)
+{
+	
+	GRAPHE_CYCLE *C;
+	C = malloc( total_molecules * sizeof( GRAPHE_CYCLE));
+	if( position == 0)
+		initialisation_fichier();
 	int i;
+	if( position > 0)
+	{
+		C = lecture_graphes_cycles_precedent(C, position);
+	}
+
+	printf("\n Calcul du graphe des cycles des %d molecules : %.3lf s\n",total_molecules,chrono());
+	
+	
 	float start,stop;
 
-	for( i = 0; i < total_molecules; i++)
+	for( i = position; i < total_molecules; i++)
 	{
 		if (i % 10 == 0) 
 		{ 
@@ -2066,15 +2168,26 @@ GRAPHE_CYCLE * calcul_graphe_cycles_all(int *liste, struct molecule *M)
 		}
 		start = chrono();
 		C[i] = construction_graphe_cycles(M[position_M(liste[i],M)]);
+		ecrire_cycle_fichier(i,C[i]);
 		stop = chrono();
-		fprintf(G, "%d %.4f\n", liste[i], stop - start);
+		
+		ecrire_temps_calcul(liste[i],start,stop);
+
+		FILE *F = fopen("graphe_cycle","w");
+		if( F == NULL)
+		{
+			fprintf(stdout, " Cannot open the file graphe_cycle");
+			exit(11);
+		}
+		fprintf(F, "%d\n", i + 1);
+		fclose(F);
 	}
-	fclose(G);
 	printf("\n Fin du Calcul du graphe des cycles des %d molecules: %.3lf s\n",total_molecules,chrono());
 
-	stocker_graphes_cycles(C);
+	//stocker_graphes_cycles(C);
 	
-	return C;
+	for( i = position; i < total_molecules; i++)
+		liberer_graphe_cycles(C[i]);
 
 
 }
@@ -2106,7 +2219,7 @@ GRAPHE_CYCLE * lecture_fichier_graphes_cycles()
 		fscanf(G,"%d",&id);
 		fscanf(G,"%d",&C[i].nb_sommets);
 		fscanf(G,"%d",&C[i].nb_aretes);
-		printf("%d %d \n", C[i].nb_sommets,C[i].nb_aretes);
+		//printf("%d %d \n", C[i].nb_sommets,C[i].nb_aretes);
 		C[i].liste_sommets = malloc(C[i].nb_sommets * sizeof (SOMMET));
 		C[i].liste_aretes = malloc(C[i].nb_aretes * sizeof (ARETE));
 
@@ -2114,7 +2227,7 @@ GRAPHE_CYCLE * lecture_fichier_graphes_cycles()
 		{
 			fscanf(G,"%d",&C[i].liste_sommets[j].id);
 			fscanf(G,"%d",&C[i].liste_sommets[j].poids);
-			printf("%d %d \n", C[i].liste_sommets[j].id,C[i].liste_sommets[j].poids);
+			//printf("%d %d \n", C[i].liste_sommets[j].id,C[i].liste_sommets[j].poids);
 		}
 
 		for( j = 0; j < C[i].nb_aretes;j++)
@@ -2123,7 +2236,7 @@ GRAPHE_CYCLE * lecture_fichier_graphes_cycles()
 			fscanf(G,"%d",&C[i].liste_aretes[j].id2);
 			fscanf(G,"%d",&C[i].liste_aretes[j].type);
 			fscanf(G,"%d",&C[i].liste_aretes[j].poids);
-			printf("%d %d %d %d\n", C[i].liste_aretes[j].id1,C[i].liste_aretes[j].id2,C[i].liste_aretes[j].type,C[i].liste_aretes[j].poids);
+			//printf("%d %d %d %d\n", C[i].liste_aretes[j].id1,C[i].liste_aretes[j].id2,C[i].liste_aretes[j].type,C[i].liste_aretes[j].poids);
 		}
 
 	}

@@ -20,23 +20,24 @@ int main(int argc, char *argv[])
 	int *liste_molecules = lecture_liste_molecules();
 
 	// on verifie si le fichier GrapheCyclesPrecalcules.cycles existe 
-
-	FILE *G = fopen("fichiers/GrapheCyclesPrecalcules.cycles","r");
-	GRAPHE_CYCLE *C = NULL;
-	if( G == NULL)
-	{// si le fichier n'xiste pas on calcule le graphe de cycles de toutes les molecules de liste_molecules
-		fclose(G);
-		C = calcul_graphe_cycles_all(liste_molecules, M);
-	}
-
-	if( C == NULL)
+	int position;
+	F = fopen("graphe_cycle","r");
+	if( F == NULL)
 	{
-		fclose(G);
-		C = lecture_fichier_graphes_cycles();
+		fprintf(stdout, " Cannot open the file graphe_cycle");
+		exit(11);
 	}
-		
-	
+	fscanf(F,"%d", &position);
+	fclose(F);
+
+	GRAPHE_CYCLE *C = NULL;
+	if( position != total_molecules)// le fichier fichiers/GrapheCyclesPrecalcules.cycles est totalement rempli
+	{
+		calcul_graphe_cycles_all(liste_molecules, M, position);
+	}
+	C = lecture_fichier_graphes_cycles();
 	int i,j;
+	
 	
 	printf("\n Debut du calcul de la similarite  : %.3lf s\n",chrono());
 	for ( i = numero ; i < total_molecules; i++)
@@ -44,7 +45,6 @@ int main(int argc, char *argv[])
 		
 		fprintf(stdout,"\r%5d / %d",i,total_molecules);
 		fflush(stdout); 
-
 		for ( j = indice ; j < i ; j++)
 		{
 			calcul_similarite_cycle_optimisation(i,j,C);

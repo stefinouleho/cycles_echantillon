@@ -696,7 +696,7 @@ void calcul_similarite_cycle_optimisation( int i ,int j, GRAPHE_CYCLE *C)
 		exit(19);
 	}
 	fprintf(F,"%.2f	",r);
-	fprintf(G,"%.2f	",stop - start);
+	fprintf(G,"%.6f	",stop - start);
 	
 	if( j == i - 1)
 	{
