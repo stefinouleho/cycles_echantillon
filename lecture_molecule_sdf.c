@@ -141,7 +141,7 @@ struct molecule * lecture_fichier_chebi()
 {//lecture du fichier chebi.sdf
 	
 	FILE *F;
-	F = fopen("../ChEBI_lite.sdf","r");
+	F = fopen("ChEBI_lite.sdf","r");
 	
 	if ( F == NULL ) 
 	{
