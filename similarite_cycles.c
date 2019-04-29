@@ -35,17 +35,18 @@ int main(int argc, char *argv[])
 	{
 		calcul_graphe_cycles_all(liste_molecules, M, position);
 	}
+	printf("je lie le fichier\n");
 	C = lecture_fichier_graphes_cycles();
 	int i,j;
 	
 	
 	printf("\n Debut du calcul de la similarite  : %.3lf s\n",chrono());
-	for ( i = numero ; i < total_molecules; i++)
+	for ( i = total_molecules - 7 ; i < total_molecules; i++)
 	{
 		
 		fprintf(stdout,"\r%5d / %d",i,total_molecules);
 		fflush(stdout); 
-		for ( j = indice ; j < i ; j++)
+		for ( j = 0 ; j < i ; j++)
 		{
 			calcul_similarite_cycle_optimisation(i,j,C);
 		}

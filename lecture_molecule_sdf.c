@@ -409,14 +409,40 @@ void liberer_molecule(struct molecule m)
 int * lecture_liste_molecules()
 {
 	int *liste = malloc ( total_molecules * sizeof(int));
-	FILE *F = fopen("fichiers/molecules.data","r");
+
+	FILE *F = fopen("fichiers/molecules.top.data","a");
 	
 	if( F == NULL)
 	{
-		fprintf(stdout, " Cannot open the file fichiers/molecules.data");
+		fprintf(stdout, " Cannot open the file fichiers/molecules.top.data");
+		exit(14);
+	}
+
+	FILE *G = fopen("fichiers/molecules_OD.data","r");
+	
+	if( G == NULL)
+	{
+		fprintf(stdout, " Cannot open the file fichiers/molecules_OD.data");
+		exit(14);
+	}
+	int i,mol;
+	for (i = 0; i < OD ; i++)
+	{
+		fscanf(G,"%d", &mol);
+		fprintf(F, "%d\n", mol);
+	}
+
+	fclose(F);
+	fclose(G);
+
+
+	F = fopen("fichiers/molecules.top.data","r");
+	
+	if( F == NULL)
+	{
+		fprintf(stdout, " Cannot open the file fichiers/molecules.top.data");
 		exit(10);
 	}
-	int i; 
 	for ( i = 0; i < total_molecules; i++)
 	{
 		fscanf(F, "%d",&liste[i]);
